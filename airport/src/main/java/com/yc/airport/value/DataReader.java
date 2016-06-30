@@ -16,6 +16,7 @@ import com.yc.airport.entity.AircraftClosure;
 import com.yc.airport.entity.MtcInfo;
 import com.yc.airport.entity.Schedule;
 import com.yc.airport.entity.FlightInfo;
+import com.yc.airport.util.PropertiesUtil;
 import com.yc.airport.util.XmlUtil;
 
 public class DataReader {
@@ -27,16 +28,23 @@ public class DataReader {
 		GloabValue.aircraftClosures = readAirportClosure(Path);
 		Schedule schedule = readSchedule(Path);
 		GloabValue.schedule = schedule;
-		GloabValue.flightInfoMap = schedule.getPartitionFlightInfoByTail();
 		
+		GloabValue.flightInfoMap = schedule.getPartitionFlightInfoByTail();
 		GloabValue.mtcInfoMap = schedule.getPartitionMtcInfoByTail();
+		
+		schedule.reListFlightInfo();
+		schedule.reListMtcInfo();
+		
 		GloabValue.aircraftClosuresMap = GenerateFlight.getAircraftClosureMap();
 		GloabValue.flightAllNum = schedule.getFlightInfos().size();
 		GloabValue.mtcAllNum = schedule.getMtcInfos().size();
+		
 		ReadAllProperties(Path);
 	}
 	public static void ReadAllProperties(String basePath) {
-		Document document = XmlUtil.read(new File(basePath+"/Parameters.xml"));
+		PropertiesUtil pUtil = new PropertiesUtil();
+		String path = pUtil.readPropertie("parameters");
+		Document document = XmlUtil.read(new File(basePath+path));
 		Element root = document.getRootElement();
 		GloabValue.weightCancelFlight = Integer.parseInt(root.element("weightCancelFlight").getStringValue());
 		GloabValue.weightCancelMaintenance = Integer.parseInt(root.element("weightCancelMaintenance").getStringValue());
@@ -50,7 +58,9 @@ public class DataReader {
 	}
 	
 	public static HashMap<String, Aircraft> readAircrafts(String basePath) {
-		Document document = XmlUtil.read(new File(basePath+"/Aircraft.xml"));
+		PropertiesUtil pUtil = new PropertiesUtil();
+		String path = pUtil.readPropertie("aircraft");
+		Document document = XmlUtil.read(new File(basePath+path));
 		List root=(List) document.selectNodes("//ns1:aircraft");
 		//List<Aircraft> listAircrafts = new ArrayList<Aircraft>();
 		HashMap<String, Aircraft> aircraftMap = new HashMap<String, Aircraft>();
@@ -71,7 +81,9 @@ public class DataReader {
 	}
 	
 	public static List<AircraftClosure> readAirportClosure(String basePath) {
-		Document document = XmlUtil.read(new File(basePath+"/AirportClosures.xml"));
+		PropertiesUtil pUtil = new PropertiesUtil();
+		String path = pUtil.readPropertie("airportClosure");
+		Document document = XmlUtil.read(new File(basePath+"/AirportClosure.xml"));
 		List root=(List) document.selectNodes("//ns2:flow");
 		List<AircraftClosure> listAircraftClosures = new ArrayList<AircraftClosure>();
 		for (Iterator iter = root.iterator(); iter.hasNext(); ) {
@@ -88,6 +100,8 @@ public class DataReader {
 	}
 	
 	public static Schedule readSchedule(String basePath) {
+		PropertiesUtil pUtil = new PropertiesUtil();
+		String path = pUtil.readPropertie("schedule");
 		Document document = XmlUtil.read(new File(basePath+"/Schedule.xml"));
 		List flightInfoList=(List) document.selectNodes("//ns3:flightInfo");
 		List mtcInfoList=(List) document.selectNodes("//ns3:mtcInfo");

@@ -21,8 +21,13 @@ public class FitnessCalc {
         List<FlightInfo> flightInfos = schedule.getFlightInfos();
         //再次优化编码
         individual.generateIndividual(0, false);
-        Individual newinIndividual = individual;
-        
+        Individual newinIndividual=null;
+		try {
+			newinIndividual = (Individual) individual.clone();
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         List<FlightInfo> newFlightInfos = newinIndividual.getFlightInfos();
         List<MtcInfo> newMtcInfos = newinIndividual.getMtcInfos();
         

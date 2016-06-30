@@ -1,5 +1,6 @@
 package com.yc.airport.algorithm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,7 +48,7 @@ public class Individual implements Cloneable {
 		generateRandomFlightInfos(isRandom);
 		// 判断单个飞机航班行程是否连续，如不连续则进行修改
 		//checkIsContinuous();
-		logger.debug(individualNum+" isLegal:"+ isLegal);
+		//logger.debug(individualNum+" isLegal:"+ isLegal);
 	}
 	private void generateRandomFlightInfos(boolean isRandom) {
 		HashMap<String, List<FlightInfo>> flightInfoMap = GloabValue.flightInfoMap;
@@ -61,21 +62,11 @@ public class Individual implements Cloneable {
 			for (int j = 0; j < flightInfoLength; j++) {
 				int c,genea,geneb;
 				if (isRandom) {
-					/*if (j==0) {
-						genes[n] = 0;
-						genes[++n] = 1;
-						c=1;
-					}else if(j == flightInfoLength-1){
-						genes[n] = 0;
-						genes[++n] = 1;
-						c=1;
-					}else {*/
 						genea = (int) Math.round(Math.random());
 						geneb = (int) Math.round(Math.random());
 						genes[n] = genea;
 						genes[++n] = geneb;
 						c = genea + geneb;
-					/*}*/
 				}else {
 					 genea = genes[n];
 					 geneb = genes[++n];
@@ -105,7 +96,6 @@ public class Individual implements Cloneable {
 			}
 		}else {
 			for (int j = GloabValue.flightAllNum * 2; j < genes.length; j++) {
-				
 				int index = j - GloabValue.flightAllNum * 2;
 				int genem = getMtcGene()[index];
 				MtcInfo mtcInfo = mtcInfos.get(index);
@@ -127,33 +117,25 @@ public class Individual implements Cloneable {
 		boolean flag = false;
 		if (type == 1) {
 			if (!checkInRecoverTime(flight)) {// 判断航班时间是否在RecoverTime内
-				// 修正基因，取消航班
 				flag = true;
-				logger.debug(flight.getId() + "航班因不在RecoverTime而取消");
 			}
 			if (!checkIsOverDelay(flight, genesNum)) {// 是否超过最大延迟时间
-				// 修正基因，取消航班
-				logger.debug(flight.getId() + "航班因延迟超出180min而取消");
+				logger.debug(flight.getId() + " 航班因延迟超出180min而取消");
 				flag = true;
 			}
 			if (!checkIsOverTurnTime(flight, genesNum, head)) {// 两次航班间隔是否大于最小间隔时间
 				flag=true;
 			}
 			if (!checkIsOverMtc(flight,genesNum)) {// 飞机是否在处于维护时段
-				// 修正基因，取消航班
-				logger.debug(flight.getId() + "航班因飞机起飞时段处于维护期间而取消");
 				flag = true;
 			}
 			int statue = checkIsAirportClose(flight);// 飞机场是否关闭
 			if (statue == 1) {
-				// 修正基因，取消航班
-				logger.debug(flight.getId() + "航班因飞机场关闭取消");
 				flag = true;
 			}
 			if (flag) {
 				genes[2 * genesNum] = 0;
 				genes[2 * genesNum + 1] = 0;
-				flight.setStatus(0);
 			}else {
 				flight.setStatus(1);
 			}
@@ -162,7 +144,7 @@ public class Individual implements Cloneable {
 				flag=true;
 			}
 			if (flag) {
-				logger.debug(flight.getId()+"flight swap cancal");
+				//logger.debug(flight.getId()+"flight swap cancal");
 				genes[2 * genesNum] = 0;
 				genes[2 * genesNum + 1] = 0;
 				flight.setStatus(0);
@@ -176,7 +158,7 @@ public class Individual implements Cloneable {
 			genes[2 * genesNum] = 0;
 			genes[2 * genesNum + 1] = 0;
 			flight.setStatus(0);
-			logger.debug("flight cancal");
+			//logger.debug("flight cancal");
 		}
 		flightInfos.set(genesNum, flight);
 	}
@@ -190,15 +172,17 @@ public class Individual implements Cloneable {
 			return true;
 		} else if (departureTime < aircraft.getStartAvailableTime()) {
 			long delay = aircraft.getStartAvailableTime() - departureTime;
-			if (delay<GloabValue.maxDelayTime) {
+			if (delay < GloabValue.maxDelayTime && delay/60  < GloabValue.weightCancelFlight) {
 				flight.setDepartureTime(aircraft.getStartAvailableTime());
 				flight.setArrivalTime(arrivalTime + delay);
-				logger.info(flight.getId()+"delay "+delay);;
+				logger.debug(flight.getId() + " 航班因起飞时间小于Recover Start Time,延迟"+ delay + "s起飞");
 			}else {
+				logger.debug(flight.getId() + " 航班因起飞时间远小于Recover Start Time,取消航班");
 				flight.setStatus(0);
 				return false;
 			}
 		} else if (arrivalTime > aircraft.getEndAvailableTime()) {
+			logger.debug(flight.getId() + " 航班因到达时间大于Recover End Time,取消航班");
 			flight.setStatus(0);
 			return false;
 		}
@@ -211,8 +195,9 @@ public class Individual implements Cloneable {
 	 */
 	private boolean checkIsOverDelay(FlightInfo flightInfo, int genesNum) {
 		FlightInfo origonFlightInfo = GloabValue.schedule.getFlightInfos().get(genesNum);
-		logger.debug(origonFlightInfo.getId());
+		//logger.debug(origonFlightInfo.getId());
 		if (flightInfo.getDepartureTime() - origonFlightInfo.getDepartureTime() > GloabValue.maxDelayTime) {
+		
 			flightInfo.setStatus(0);
 			return false;
 		}
@@ -230,23 +215,23 @@ public class Individual implements Cloneable {
 			long turnTime = fInfo.getDepartureTime() - fInfo1.getArrivalTime();
 			if (turnTime <= GloabValue.turnTime) {
 				long delay = GloabValue.turnTime - turnTime;// 延时
-				if (delay <= GloabValue.maxDelayTime  && delay < GloabValue.weightCancelFlight) {
+				if (delay < GloabValue.maxDelayTime) {
 					fInfo.setDepartureTime(fInfo1.getArrivalTime()
 							+ GloabValue.turnTime);// 修正
 					fInfo.setArrivalTime(fInfo.getArrivalTime() + delay);// 修正
-					logger.debug(fInfo.getId() + "航班因两次起飞间隔小于30min,修正起飞时间，延迟"+ delay + "s");
+					logger.debug(fInfo.getId() + " 航班因两次起飞间隔小于30min,修正起飞时间，延迟"+ delay + "s");
 					fInfo.setStatus(1);
 				} else {
 					fInfo.setStatus(0);
-					logger.debug(fInfo.getId() + " 因起飞延迟过长："+ delay + "s,必须取消航班");
+					logger.debug(fInfo.getId() + " 航班因起飞延迟过长："+ delay + "s,必须取消航班");
 					return false;
 				}
 			}
 		} else if (genesNum == head) {
-			logger.debug("第一趟航班");
+		//	logger.debug("第一趟航班");
 		} else if (getGenesType(tmpNum) == 0) {
-			logger.debug("genesNum:"+tmpNum);
-			logger.debug(individualNum+":" + flightInfos.get(tmpNum).getId() +"航班取消");
+			//logger.debug("genesNum:"+tmpNum);
+			//logger.debug(individualNum+":" + flightInfos.get(tmpNum).getId() +"航班取消");
 			int type = 0;
 			while(type>0) {
 				if (tmpNum==head) {
@@ -258,14 +243,14 @@ public class Individual implements Cloneable {
 			long turnTime = fInfo.getDepartureTime() - fInfo1.getArrivalTime();
 			if (turnTime < GloabValue.turnTime) {
 				long delay = GloabValue.turnTime - turnTime;// 延时
-				if (delay <= GloabValue.maxDelayTime  && delay < GloabValue.weightCancelFlight) {
+				if (delay < GloabValue.maxDelayTime  && delay/60  < GloabValue.weightCancelFlight) {
 					fInfo.setDepartureTime(fInfo1.getArrivalTime()+ GloabValue.turnTime);// 修正
 					fInfo.setArrivalTime(fInfo.getArrivalTime() + delay);// 修正
 					logger.debug(fInfo.getId() + "航班因两次起飞间隔小于30min,修正起飞时间，延迟"+ delay + "s");
 					fInfo.setStatus(1);
 				} else {
 					fInfo.setStatus(0);
-					logger.debug(fInfo.getId() + " 因起飞延迟过长："+ delay + "s,必须取消航班");
+					logger.debug(fInfo.getId() + " 航班因起飞延迟过长："+ delay + "s,必须取消航班");
 					return false;
 				}
 			}
@@ -295,11 +280,18 @@ public class Individual implements Cloneable {
 						genes[2 * genesNum] = 1;
 						genes[2 * genesNum + 1] = 1;
 						flight.setStatus(2);
-					}else if (delay<GloabValue.maxDelayTime && delay < GloabValue.weightCancelFlight) {
+					}else if (delay<GloabValue.maxDelayTime && delay/60  < GloabValue.weightCancelFlight) {
+						
+						logger.debug(flight.getId() + " 航班因在起飞机场："
+								+ mtcInfo.getAirport()
+								+ "维护,推迟航班"+delay+"s");
 						flight.setDepartureTime(end);
 						flight.setArrivalTime(flightInfoArrivalTime+delay);
 					}else {// 取消航班
-						flight.setStatus(0);
+						logger.debug(flight.getId() + " 航班因在起飞机场："
+								+ mtcInfo.getAirport()
+								+ "维护,取消航班");
+						flight.setStatus(0); //--------------
 						return false;
 					}
 				}
@@ -362,34 +354,40 @@ public class Individual implements Cloneable {
 	
 	public void checkIsContinuous() {
 		HashMap<String, List<FlightInfo>> flightInfoMap = GloabValue.flightInfoMap;
-		int n = 0; 
 		int head=0;
 		//遍历每一架飞机
 		for (int i = 0; i < GloabValue.TAILS.length; i++) {
 			String tail = GloabValue.TAILS[i];
 			List<FlightInfo> flightInfoList= flightInfoMap.get(tail);
 			int flightInfoLength = flightInfoList.size();
-			for (int j = 0; j < flightInfoLength; j++) {
-				FlightInfo flightInfo = flightInfos.get(n);
-				if (flightInfo.getStatus()==0) {
-					if (j!=0&&j!=flightInfoLength-1){
-						int t =n-1;
-						FlightInfo fpre = flightInfos.get(t);
-						while(t>head && fpre.getStatus()==0){
-							fpre = flightInfos.get(--t);
+			boolean flag = false;
+			FlightInfo lastflightInfo = null;
+			for (int j = flightInfoLength-1 ; j >=0; j--) {
+				int index = head+j;
+				FlightInfo  flightInfo = flightInfos.get(index);
+				if (getGenesType(index)==0) {
+					flightInfo.setStatus(0);
+					if (!flag) {
+						flag = true;
+						lastflightInfo = flightInfo;
+					}
+					flightInfos.set(index, flightInfo);
+				}else {
+					if (flag) {
+						if (flightInfo.getDepartureAirport().equals(lastflightInfo.getArrivalAirport())) {
+							flightInfo.setStatus(0);
+							flightInfos.set(index, flightInfo);
+						}else {
+							flightInfo.setArrivalAirport(lastflightInfo.getArrivalAirport());
+							flag = false;
 						}
-						int f = n+1;
-						FlightInfo fafter = flightInfos.get(f);
-						while(f<head+flightInfoLength-1 && fafter.getStatus()==0){
-							fafter = flightInfos.get(++f);
-						}
-						if (fpre.getStatus()>0&&fafter.getStatus()>0) {
-							fpre.setArrivalAirport(fafter.getDepartureAirport());
-							flightInfos.set(t, fpre);
-						}
+					}else {
+						lastflightInfo = null;
 					}
 				}
-				n++;
+				if (!flightInfoList.get(j).getId().equals(flightInfo.getId())) {
+					logger.warn(flightInfo.getId()+"is not equal");
+				}
 			}
 			head += flightInfoLength;
 		}
@@ -417,7 +415,7 @@ public class Individual implements Cloneable {
 				if (flightInfoDepartureTime > start
 						&& flightInfoDepartureTime <= end) {
 					long delay = end - flightInfoDepartureTime;
-					if (delay < GloabValue.maxDelayTime && delay < GloabValue.weightCancelFlight) {
+					if (delay < GloabValue.maxDelayTime && delay/60  < GloabValue.weightCancelFlight) {
 						logger.debug(flightInfo.getId() + " 因起飞机场："
 								+ flightInfo.getDepartureAirport() + "关闭"
 								+ "延迟" + delay + "s起飞,起飞时间：" + end + "s");
@@ -448,7 +446,7 @@ public class Individual implements Cloneable {
 						&& flightInfoArrivalTime < end) {
 					
 					long delay = end - flightInfoArrivalTime;
-					if (delay < GloabValue.maxDelayTime && delay < GloabValue.weightCancelFlight) {
+					if (delay < GloabValue.maxDelayTime && delay/60 < GloabValue.weightCancelFlight) {
 						logger.debug(flightInfo.getId() + " 因到达机场："
 								+ flightInfo.getArrivalAirport() + "关闭" + ",延迟"
 								+ delay + "s起飞,起飞时间："
@@ -605,14 +603,28 @@ public class Individual implements Cloneable {
 	public void setMtcInfos(List<MtcInfo> mtcInfos) {
 		this.mtcInfos = mtcInfos;
 	}
-
+	
+	public int[] getGenes() {
+		return genes;
+	}
+	public void setGenes(int[] genes) {
+		this.genes = genes;
+	}
 	@Override
 	public String toString() {
 		return  Arrays.toString(genes);
 	}
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		return super.clone();
+		Individual individual =	(Individual)super.clone();
+		List<FlightInfo> flightInfos = new ArrayList<FlightInfo>(GloabValue.flightAllNum);
+		List<MtcInfo> mtcInfos = new ArrayList<MtcInfo>(GloabValue.mtcAllNum);
+		individual.setGenes(genes.clone());
+		flightInfos.addAll(this.flightInfos);
+		mtcInfos.addAll(this.mtcInfos);
+		individual.setFlightInfos(flightInfos);
+		individual.setMtcInfos(mtcInfos);
+		return individual;
 	}
 	
 }

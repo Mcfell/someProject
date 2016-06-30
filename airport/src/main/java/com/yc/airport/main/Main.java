@@ -12,14 +12,20 @@ import com.yc.airport.algorithm.FitnessCalc;
 import com.yc.airport.algorithm.Individual;
 import com.yc.airport.algorithm.Population;
 import com.yc.airport.entity.FlightInfo;
+import com.yc.airport.entity.MtcInfo;
 import com.yc.airport.entity.Schedule;
 import com.yc.airport.util.XmlUtil;
 import com.yc.airport.value.DataReader;
 import com.yc.airport.value.GenerateFlight;
 import com.yc.airport.value.GloabValue;
-
+/**
+ * 
+ * <p>Title: Main</p>
+ * <p>Description: program start class</p>
+ * @author mcfell
+ * @date 2016年6月30日
+ */
 public class Main {
-
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -43,13 +49,13 @@ public class Main {
 		int generationCount = 0;
 		long lastFitness = 0;
 		int times = 0;
-		Individual individualFittest;
+		Individual individualFittest = null;
 		while (true) {
 			generationCount++;
 			individualFittest = myPop.getFittest();
 			long nowFitness= individualFittest.getFitness();
 			logger.info("Generation: " + generationCount + " Fittest: "+ nowFitness);
-			individualFittest.printGenesInfo();
+			//individualFittest.printGenesInfo();
 			if (Math.abs(lastFitness - nowFitness)<5) {
 				times++;
 				if (times>20) {
@@ -62,17 +68,12 @@ public class Main {
 			lastFitness = nowFitness;
 		}
 		System.out.println("Solution found!");
-		//individualFittest.checkIsContinuous();
+		individualFittest.checkIsContinuous();
 		individualFittest.printGenesInfo();
 		individualFittest.printSchedualInfo(true);
 		System.out.println("Generation: " + generationCount);
 		System.out.println("Final Fittest Genes:"+lastFitness);
 		return individualFittest;
-	}
-	
-	public static Individual solutionOptimize(Individual individual) {
-		int[] FlightGenes = individual.getFlightGene();
-		return individual;
 	}
 
 }
