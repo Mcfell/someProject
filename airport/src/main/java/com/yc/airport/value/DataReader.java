@@ -23,16 +23,16 @@ public class DataReader {
 	 * 初始化xml中的信息
 	 */
 	public static void ReadAllXml(String Path) {
-		GloabValue.aircrafts = readAircrafts(Path);
+		GloabValue.aircraftsMap = readAircrafts(Path);
 		GloabValue.aircraftClosures = readAirportClosure(Path);
 		Schedule schedule = readSchedule(Path);
 		GloabValue.schedule = schedule;
 		GloabValue.flightInfoMap = schedule.getPartitionFlightInfoByTail();
-		GloabValue.mtcInfoMap = schedule.getPartitionMtcInfoByTail();
 		
+		GloabValue.mtcInfoMap = schedule.getPartitionMtcInfoByTail();
+		GloabValue.aircraftClosuresMap = GenerateFlight.getAircraftClosureMap();
 		GloabValue.flightAllNum = schedule.getFlightInfos().size();
 		GloabValue.mtcAllNum = schedule.getMtcInfos().size();
-		
 		ReadAllProperties(Path);
 	}
 	public static void ReadAllProperties(String basePath) {

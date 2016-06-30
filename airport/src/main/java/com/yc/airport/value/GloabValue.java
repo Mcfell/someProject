@@ -10,15 +10,18 @@ import com.yc.airport.entity.MtcInfo;
 import com.yc.airport.entity.Schedule;
 
 public class GloabValue {
-	public static HashMap<String, Aircraft> aircrafts;
+	public static HashMap<String, Aircraft> aircraftsMap;
+	public static HashMap<String, List<AircraftClosure>> aircraftClosuresMap;
 	public static List<AircraftClosure> aircraftClosures;
 	public static Schedule schedule;
 	public static HashMap<String, List<FlightInfo>> flightInfoMap;
 	public static HashMap<String, List<MtcInfo>> mtcInfoMap;
 	public static Schedule newSchdule;
+	public static List<Schedule> scheduleList;
 	
 	public static int flightAllNum;
 	public static int mtcAllNum;
+	public static int popNum;
 
 	public static int weightCancelMaintenance ;
 	public static int weightCancelFlight ;

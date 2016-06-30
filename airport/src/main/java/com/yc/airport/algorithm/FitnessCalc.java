@@ -18,53 +18,47 @@ public class FitnessCalc {
 	public static long getFitness(Individual individual) {
         long fitness = 0;
         Schedule schedule = GloabValue.schedule;
-        Schedule newSchedule = GloabValue.newSchdule;
-        
         List<FlightInfo> flightInfos = schedule.getFlightInfos();
-        List<FlightInfo> newFlightInfos = newSchedule.getFlightInfos();
-        List<MtcInfo> newMtcInfos = newSchedule.getMtcInfos();
+        //再次优化编码
+        individual.generateIndividual(0, false);
+        Individual newinIndividual = individual;
         
-        int[] flightGene = individual.getFlightGene();
-        int[] mtcGene = individual.getMtcGene();
+        List<FlightInfo> newFlightInfos = newinIndividual.getFlightInfos();
+        List<MtcInfo> newMtcInfos = newinIndividual.getMtcInfos();
+        
+        int[] flightGene = newinIndividual.getFlightGene();
+        int[] mtcGene = newinIndividual.getMtcGene();
 		for (int i = 0; i < GloabValue.flightAllNum; i++) {
 			FlightInfo flightInfo = flightInfos.get(i);
 			FlightInfo newFlightInfo = newFlightInfos.get(i);
-			if (!newFlightInfo.getStatus()) {
-				individual.setGene(i, 0);
-			}
-			if (flightGene[i]==0) {
+			int genea = flightGene[2*i];
+			int geneb = flightGene[2*i+1];
+			if (genea+geneb==0) {
+				//logger.info("cancal:"+i);
 				//2.取消航班代价
 				fitness+=800;
 				continue;
-			}
-			
-			boolean isTailEqual = newFlightInfo.getTailNumber().equals(flightInfo.getTailNumber());
-			boolean isArrivalAirportEqual = newFlightInfo.getArrivalAirport().equals(flightInfo.getArrivalAirport());
-			int ArrivalK = 0;
-			//1.此次航班延误时间代价
-			long delay = Math.abs(newFlightInfo.getDepartureTime() - flightInfo.getDepartureTime());
-			fitness+= Math.abs(delay);
-			//4.航班交换代价
-			if (!isTailEqual) {
-				fitness+=10;
-			}
-			//6.飞机终点机场与原计划终点机场不同所付出的代价,有问题？
-			if (isTailEqual) {
-				if (!isArrivalAirportEqual) {
-					ArrivalK = 1;
-				}
 			}else {
-				if (!isArrivalAirportEqual) {
-					ArrivalK = 1;
+				//1.此次航班延误时间代价
+				long delay = Math.abs(newFlightInfo.getDepartureTime() - flightInfo.getDepartureTime());
+				fitness+= delay;
+				//4.航班交换代价
+				if (genea+geneb==2) {
+					fitness+=10;
 				}
-			}
-			fitness+=10*ArrivalK;
+				//6.飞机终点机场与原计划终点机场不同所付出的代价
+				boolean isArrivalAirportEqual = newFlightInfo.getArrivalAirport().equals(flightInfo.getArrivalAirport())
+						&& newFlightInfo.getDepartureAirport().equals(flightInfo.getDepartureAirport());
+				if (!isArrivalAirportEqual) {
+					fitness+=10;
+				}
+			} 
+			
 		}
 		//3.取消维护任务代价
 		for (int i = 0; i < GloabValue.mtcAllNum; i++) {
 			fitness+=mtcGene[i]*1000;
 		}
-		
         return fitness;
     }
 }

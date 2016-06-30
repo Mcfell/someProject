@@ -5,7 +5,7 @@ public class Algorithm {
     /* GA 算法的参数 */
     private static final double uniformRate = 0.5; //交叉概率
     private static final double mutationRate = 0.015; //突变概率
-    private static final int tournamentSize = 5; //淘汰数组的大小
+    private static final int tournamentSize = 4; //淘汰数组的大小
     private static final boolean elitism = true; //精英主义
 
     /* Public methods */
@@ -42,11 +42,10 @@ public class Algorithm {
         for (int i = elitismOffset; i < newPopulation.size(); i++) {
             mutate(newPopulation.getIndividual(i));
         }
-
         return newPopulation;
     }
 
-    // 进行两个个体的交叉 (暂且想象为make love的过程吧)。 交叉的概率为uniformRate
+    // 进行两个个体的交叉 。 交叉的概率为uniformRate
     private static Individual crossover(Individual indiv1, Individual indiv2) {
         Individual newSol = new Individual();
         // 随机的从 两个个体中选择 
@@ -71,7 +70,7 @@ public class Algorithm {
         }
     }
 
-    // 随机选择一个较优秀的个体，用了进行交叉
+    // 随机选择一个较优秀的个体，用于进行交叉
     private static Individual tournamentSelection(Population pop) {
         // Create a tournament population
         Population tournamentPop = new Population(tournamentSize, false);

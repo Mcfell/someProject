@@ -1,7 +1,5 @@
 package com.yc.airport.algorithm;
 
-import java.util.List;
-
 public class Population {
 	Individual[] individuals;
     /**
@@ -14,11 +12,9 @@ public class Population {
         individuals = new Individual[populationSize];
         // 初始化种群
         if (initialise) {
-        	Individual.setStableGenes();
             for (int i = 0; i < size(); i++) {
-            	
                 Individual newIndividual = new Individual();
-                newIndividual.generateIndividual();
+                newIndividual.generateIndividual(i,true);
                 saveIndividual(i, newIndividual);
             }
         }

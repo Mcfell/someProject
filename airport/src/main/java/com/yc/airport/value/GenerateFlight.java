@@ -20,7 +20,7 @@ public class GenerateFlight {
 
 	private static final Logger logger = LoggerFactory.getLogger(GenerateFlight.class);
 	//航班延误机率
-	private static final double delayProbability = 0.5;
+	private static final double delayProbability = 0;
 	//航班在机场关闭时取消的概率
 	private static final double flightCancelProbabilty = 0.3;
 	/*enum airport{
@@ -53,7 +53,6 @@ public class GenerateFlight {
 		HashMap<String, List<MtcInfo>> mtcInfoMap = GloabValue.mtcInfoMap;
 		for (int i = 0; i < GloabValue.TAILS.length; i++) {
 			String tail = GloabValue.TAILS[i];
-			
 		}
 		return mtcInfos;
 	}
@@ -65,7 +64,7 @@ public class GenerateFlight {
 		List<FlightInfo> flightInfos = new ArrayList<FlightInfo>();
 		
 		HashMap<String, List<FlightInfo>> flightInfoMap = GloabValue.flightInfoMap;
-		HashMap<String,List<AircraftClosure>> aircraftClosureMap =	getAircraftClosureMap();
+		int genesNum = 0;
 		//遍历每一架飞机
 		for (int i = 0; i < GloabValue.TAILS.length; i++) {
 			String tail = GloabValue.TAILS[i];
@@ -73,7 +72,7 @@ public class GenerateFlight {
 			List<FlightInfo> flightInfo= flightInfoMap.get(tail);
 			int flightInfoLength = flightInfo.size();
 			
-			Aircraft aircraft = GloabValue.aircrafts.get(tail);
+			Aircraft aircraft = GloabValue.aircraftsMap.get(tail);
 			String startAvailableAirport = aircraft.getStartAvailableAirport();
 			String endAvailableAirport = aircraft.getEndAvailableAirport();
 			
@@ -83,18 +82,18 @@ public class GenerateFlight {
 				FlightInfo flight = flightInfo.get(j);
 				String tmp;
 				logger.debug("起飞机场："+lastArrivalAirport);
-				//如果修改了上一次任务航班信息
+				/*//如果修改了上一次任务航班信息
 				if (flightChangeFlag) { 
 					flight.setDepartureAirport(lastArrivalAirport);//设置离开机场为上一次到达的机场
 					lastArrivalAirport = flight.getArrivalAirport();
 				}else{//如果机场关闭，则修改对应航班机场或者取消此次航班
-					switch (isAirportClose(aircraftClosureMap, flight)) {
+					switch (isAirportClose(flight)) {
 					case 1://起点机场关闭，取消航班
-						flight.setStatus(false);
+						flight.setStatus(0);
 						break;
 					case 2://到达机场关闭，分两种情况
 						if (Math.random()< flightCancelProbabilty) { //取消航班
-							flight.setStatus(false);
+							flight.setStatus(0);
 						}else {
 							tmp = generateRandomAirport();
 							while (lastArrivalAirport.equals(tmp) && flight.getArrivalAirport().equals(tmp)) {//随机生成到达机场,到达机场与离开机场不同
@@ -111,47 +110,22 @@ public class GenerateFlight {
 				}
 				
 				if (Math.random()<delayProbability) {
-					
 					long delayTime = generateRandomDelayTime();
 					flight.setDepartureTime(delayTime+flight.getDepartureTime());//设置随机推迟时间
 					logger.debug(flight.getId()+" 延迟 "+delayTime+"s"+".Now is："+flight.getDepartureTime());
-				}
-				/*if (j==0) {
-					flight.setDepartureAirport(startAvailableAirport);//设置起点机场
-					tmp = generateRandomAirport();
-					while (lastArrivalAirport.equals(tmp)) {//随机生成到达机场,到达机场与离开机场不同
-						tmp = generateRandomAirport();
-					}
-					lastArrivalAirport = tmp;
-					flight.setArrivalAirport(lastArrivalAirport); 
-				}else if (j==flightInfoLength-1) {
-					flight.setDepartureAirport(lastArrivalAirport);
-					flight.setArrivalAirport(endAvailableAirport);
-				}else {
-					flight.setDepartureAirport(lastArrivalAirport);//设置离开机场为上一次到达的机场
-					tmp = generateRandomAirport();
-					if (j==flightInfoLength-2) { //使倒数第二趟航班的到达机场不等于终点机场
-						while (tmp.equals(endAvailableAirport) || lastArrivalAirport.equals(tmp)) {
-							tmp = generateRandomAirport();
-						}
-					}else {
-						while (lastArrivalAirport.equals(tmp)) {//随机生成到达机场,到达机场与离开机场不同
-							tmp = generateRandomAirport();
-						}
-					}
-					lastArrivalAirport = tmp;
-					flight.setArrivalAirport(lastArrivalAirport); 
 				}*/
-				//logger.debug("flight:"+j+"   "+flight.toString());
 				flightInfos.add(flight);
 			}
+			genesNum++;
 		}
 		return flightInfos;
 	}
 	/*
 	 * 判断机场是否处于关闭状态
+	 * reutrn 1,起飞机场处于关闭时段；2，到达机场处于关闭时段 ；0，正常
 	 */
-	private static int isAirportClose(HashMap<String,List<AircraftClosure>> aircraftClosureMap , FlightInfo flightInfo) {
+	public static int isAirportClose(FlightInfo flightInfo) {
+		HashMap<String,List<AircraftClosure>> aircraftClosureMap =	GloabValue.aircraftClosuresMap;
 		int statue = 0;
 		//boolean isClose = false;
 		List<AircraftClosure> aircraftClosures = null;
@@ -199,7 +173,7 @@ public class GenerateFlight {
 	/*
 	 * 获取机场关闭的HashMap,Key为机场名
 	 */
-	private static HashMap<String,List<AircraftClosure>> getAircraftClosureMap() {
+	public static HashMap<String,List<AircraftClosure>> getAircraftClosureMap() {
 		List<AircraftClosure> aircraftClosures = GloabValue.aircraftClosures;
 		HashMap<String,List<AircraftClosure>> aircraftClosureMap = new HashMap<String, List<AircraftClosure>>();
 		for (Iterator iterator = aircraftClosures.iterator(); iterator.hasNext();) {

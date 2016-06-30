@@ -1,11 +1,19 @@
 package com.yc.airport.main;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.yc.airport.algorithm.Algorithm;
 import com.yc.airport.algorithm.FitnessCalc;
+import com.yc.airport.algorithm.Individual;
 import com.yc.airport.algorithm.Population;
+import com.yc.airport.entity.FlightInfo;
+import com.yc.airport.entity.Schedule;
+import com.yc.airport.util.XmlUtil;
 import com.yc.airport.value.DataReader;
 import com.yc.airport.value.GenerateFlight;
 import com.yc.airport.value.GloabValue;
@@ -16,26 +24,35 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		logger.info("read input data start");
-		DataReader.ReadAllXml("C:/Users/Administrator/Desktop/竞赛数据表格/Data/Scenario1/input");
+		DataReader.ReadAllXml(args[0]);
 		logger.info("read input data end");
-		logger.info("生成实际Schedual数据开始");
-		GenerateFlight.generateSchedule();
-		logger.info("生成实际Schedual数据结束");
 		logger.info("生成初始种群");
-		Population myPop = new Population(50, true);
-
+		GloabValue.popNum = 100;
+		GloabValue.scheduleList = new ArrayList<Schedule>(GloabValue.popNum);
+		for (int i = 0; i < GloabValue.popNum; i++) {
+			GloabValue.scheduleList.add(GloabValue.schedule);
+		}
+		Population myPop = new Population(GloabValue.popNum, true);
 		// 不段迭代，进行进化操作。 直到找到期望的基因序列
+		Individual individualFittest = solution(myPop);
+		logger.info("计算完成，航班输出路径："+args[1]+"/Output.xml");
+		XmlUtil.creatOutputXml(individualFittest.getFlightInfos(), individualFittest.getMtcInfos(), args[1]+"/Output.xml");
+	}
+	
+	private static Individual solution(Population myPop) {
 		int generationCount = 0;
 		long lastFitness = 0;
 		int times = 0;
+		Individual individualFittest;
 		while (true) {
 			generationCount++;
-			long nowFitness= myPop.getFittest().getFitness();
-			System.out.println("Generation: " + generationCount + " Fittest: "+ nowFitness);
-			System.out.println(myPop.getFittest().toString());
-			if (Math.abs(lastFitness - nowFitness)<10) {
+			individualFittest = myPop.getFittest();
+			long nowFitness= individualFittest.getFitness();
+			logger.info("Generation: " + generationCount + " Fittest: "+ nowFitness);
+			individualFittest.printGenesInfo();
+			if (Math.abs(lastFitness - nowFitness)<5) {
 				times++;
-				if (times>10) {
+				if (times>20) {
 					break;
 				}
 			}else {
@@ -45,9 +62,17 @@ public class Main {
 			lastFitness = nowFitness;
 		}
 		System.out.println("Solution found!");
+		//individualFittest.checkIsContinuous();
+		individualFittest.printGenesInfo();
+		individualFittest.printSchedualInfo(true);
 		System.out.println("Generation: " + generationCount);
 		System.out.println("Final Fittest Genes:"+lastFitness);
-		logger.info(myPop.getFittest().toString());
+		return individualFittest;
+	}
+	
+	public static Individual solutionOptimize(Individual individual) {
+		int[] FlightGenes = individual.getFlightGene();
+		return individual;
 	}
 
 }

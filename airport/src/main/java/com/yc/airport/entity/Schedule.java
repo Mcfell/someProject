@@ -49,7 +49,6 @@ public class Schedule {
 			}
 			rHashMap.put(tail, list);
 		}
-		
 		return rHashMap;
 	}
 	/*

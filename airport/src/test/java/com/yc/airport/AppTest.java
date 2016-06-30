@@ -27,9 +27,12 @@ import org.dom4j.io.SAXReader;
 
 
 
+
+
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.yc.airport.algorithm.Individual;
 import com.yc.airport.entity.Aircraft;
+import com.yc.airport.entity.FlightInfo;
 import com.yc.airport.entity.Schedule;
 import com.yc.airport.util.XmlUtil;
 import com.yc.airport.value.DataReader;
@@ -180,14 +183,27 @@ public class AppTest extends TestCase {
 		DataReader.ReadAllXml("C:/Users/Administrator/Desktop/竞赛数据表格/Data/Scenario1/input");
 		Schedule schedule = GenerateFlight.generateSchedule();
 		Individual individual = new Individual();
-		individual.generateIndividual();
+		//individual.generateIndividual();
 		individual.getFlightGene();
 		individual.getMtcGene();
 	}
 	public void testIndividual() {
 		Individual individual = new Individual();
-		individual.generateIndividual();
+		//individual.generateIndividual();
 		individual.getFlightGene();
 		individual.getMtcGene();
+	}
+	public void testCreatXml() throws Exception{
+		Document document = XmlUtil.createDocument();
+		Element rootElement = document.addElement("exportAircrafts");
+		document.setRootElement(rootElement);
+		Element flightInfoList = rootElement.addElement("flightInfoList");
+		FlightInfo flightInfo = new FlightInfo("123", 12313L, 13213L, "JOE", "sam", "sdf",1);
+		FlightInfo flightInfo2 = new FlightInfo("123", 12313L, 13213L, "JOE", "sam", "sdf",1);
+		FlightInfo flightInfo3 = new FlightInfo("123", 12313L, 13213L, "JOE", "sam", "sdf",1);
+		XmlUtil.flightInfo2Element(flightInfo, flightInfoList);
+		XmlUtil.flightInfo2Element(flightInfo2, flightInfoList);
+		XmlUtil.flightInfo2Element(flightInfo3, flightInfoList);
+		XmlUtil.writDocumentToFile(document, "E:/Data/output.xml", "utf-8");
 	}
 }

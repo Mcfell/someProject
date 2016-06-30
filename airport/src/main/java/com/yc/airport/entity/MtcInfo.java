@@ -6,7 +6,7 @@ public class MtcInfo {
 	private long endTime;
 	private String airport;
 	private String tailNumber;
-	private boolean status;
+	private boolean status = true; //始终执行维护任务
 	public String getId() {
 		return id;
 	}

@@ -20,6 +20,9 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
 import com.yc.airport.entity.Aircraft;
+import com.yc.airport.entity.FlightInfo;
+import com.yc.airport.entity.MtcInfo;
+import com.yc.airport.entity.Schedule;
  
 /**
  * XML工具类
@@ -269,9 +272,61 @@ public class XmlUtil {
     public static Document createDocument() {
         return DocumentHelper.createDocument();
     }
-     
+    public static Element flightInfo2Element(FlightInfo flightInfo,Element flightInfoListNode) {
+		Element f1 = flightInfoListNode.addElement("flightInfo");
+		f1.addElement("id").setText(flightInfo.getId());
+		f1.addElement("departureTime").setText(String.valueOf(flightInfo.getDepartureTime()));
+		f1.addElement("arrivalTime").setText(String.valueOf(flightInfo.getArrivalTime()));
+		f1.addElement("departureAirport").setText(flightInfo.getDepartureAirport());
+		f1.addElement("arrivalAirport").setText(flightInfo.getArrivalAirport());
+		f1.addElement("tailNumber").setText(flightInfo.getTailNumber());
+		if (flightInfo.getStatus()==0) {
+			f1.addElement("status").setText("Cancelled");
+		}else {
+			f1.addElement("status").setText("Assigned");
+		}
+		return f1;
+	}
+    private static Element mtcInfo2Element(MtcInfo mtcInfo, Element mtcInfoListNode) {
+    	Element f1 = mtcInfoListNode.addElement("mtcInfo");
+		f1.addElement("id").setText(mtcInfo.getId());
+		f1.addElement("startTime").setText(String.valueOf(mtcInfo.getStartTime()));
+		f1.addElement("endTime").setText(String.valueOf(mtcInfo.getEndTime()));
+		f1.addElement("airport").setText(mtcInfo.getAirport());
+		f1.addElement("tailNumber").setText(mtcInfo.getTailNumber());
+		if (mtcInfo.getStatus()) {
+			f1.addElement("status").setText("Assigned");
+		}else {
+			f1.addElement("status").setText("Cancelled");
+		}
+		return f1;
+		
+	}
+    public static void creatOutputXml(List<FlightInfo> flightInfos,List<MtcInfo> mtcInfos,String outputPath){
+    	Document document = XmlUtil.createDocument();
+		Element rootElement = document.addElement("exportAircrafts");
+		document.setRootElement(rootElement);
+		Element flightInfoList = rootElement.addElement("flightInfoList");
+		Element mtcInfoList = rootElement.addElement("mtcInfoList");
+		for (Iterator iterator = flightInfos.iterator(); iterator.hasNext();) {
+			FlightInfo flightInfo = (FlightInfo) iterator.next();
+			XmlUtil.flightInfo2Element(flightInfo, flightInfoList);
+		}
+		for (Iterator iterator = mtcInfos.iterator(); iterator.hasNext();) {
+			MtcInfo mtcInfo = (MtcInfo) iterator.next();
+			XmlUtil.mtcInfo2Element(mtcInfo,mtcInfoList);
+		}
+		try {
+			XmlUtil.writDocumentToFile(document, outputPath, "utf-8");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
  
-    public static void main(String[] args) {
+    
+
+	public static void main(String[] args) {
     	Document aircrafts = XmlUtil.read(new File("C:/Users/Administrator/Desktop/竞赛数据表格/Data/Scenario1/input/Aircraft.xml"));
         //System.out.println(aircrafts.getRootElement().get);
     	List nodes = aircrafts.getRootElement().elements("ns1:aircraft");
@@ -285,7 +340,6 @@ public class XmlUtil {
     	//System.out.println(XmlUtil.getElementValue("ns1:aircraft",aircrafts.getRootElement()));
         //System.out.println(aircrafts.getText());
     	//System.out.println(XmlUtil.xmltoString(aircrafts));
-    	
         System.out.println("end");
     	// System.out.println(XmlTool.xmltoString(Disconnect.getDisconnectDocument(),
         // "UTF-8"));

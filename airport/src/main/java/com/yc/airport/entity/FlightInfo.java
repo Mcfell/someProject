@@ -7,7 +7,7 @@ public class FlightInfo {
 	private String departureAirport;
 	private String arrivalAirport;
 	private String tailNumber;
-	private boolean status = true;
+	private int status = 1;
 	public String getId() {
 		return id;
 	}
@@ -45,10 +45,10 @@ public class FlightInfo {
 		this.tailNumber = tailNumber;
 	}
 	
-	public boolean getStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(boolean status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 	public FlightInfo(String id, long departureTime, long arrivalTime,
@@ -64,7 +64,7 @@ public class FlightInfo {
 	
 	public FlightInfo(String id, long departureTime, long arrivalTime,
 			String departureAirport, String arrivalAirport, String tailNumber,
-			boolean status) {
+			int status) {
 		super();
 		this.id = id;
 		this.departureTime = departureTime;
