@@ -273,31 +273,31 @@ public class XmlUtil {
         return DocumentHelper.createDocument();
     }
     public static Element flightInfo2Element(FlightInfo flightInfo,Element flightInfoListNode) {
-		Element f1 = flightInfoListNode.addElement("flightInfo");
-		f1.addElement("id").setText(flightInfo.getId());
-		f1.addElement("departureTime").setText(String.valueOf(flightInfo.getDepartureTime()));
-		f1.addElement("arrivalTime").setText(String.valueOf(flightInfo.getArrivalTime()));
-		f1.addElement("departureAirport").setText(flightInfo.getDepartureAirport());
-		f1.addElement("arrivalAirport").setText(flightInfo.getArrivalAirport());
-		f1.addElement("tailNumber").setText(flightInfo.getTailNumber());
+		Element f1 = flightInfoListNode.addElement("ns3:flightInfo");
+		f1.addElement("ns3:id").setText(flightInfo.getId());
+		f1.addElement("ns3:departureTime").setText(String.valueOf(flightInfo.getDepartureTime()));
+		f1.addElement("ns3:arrivalTime").setText(String.valueOf(flightInfo.getArrivalTime()));
+		f1.addElement("ns3:departureAirport").setText(flightInfo.getDepartureAirport());
+		f1.addElement("ns3:arrivalAirport").setText(flightInfo.getArrivalAirport());
+		f1.addElement("ns3:tailNumber").setText(flightInfo.getTailNumber());
 		if (flightInfo.getStatus()==0) {
-			f1.addElement("status").setText("Cancelled");
+			f1.addElement("ns3:status").setText("Cancelled");
 		}else {
-			f1.addElement("status").setText("Assigned");
+			f1.addElement("ns3:status").setText("Assigned");
 		}
 		return f1;
 	}
     private static Element mtcInfo2Element(MtcInfo mtcInfo, Element mtcInfoListNode) {
-    	Element f1 = mtcInfoListNode.addElement("mtcInfo");
-		f1.addElement("id").setText(mtcInfo.getId());
-		f1.addElement("startTime").setText(String.valueOf(mtcInfo.getStartTime()));
-		f1.addElement("endTime").setText(String.valueOf(mtcInfo.getEndTime()));
-		f1.addElement("airport").setText(mtcInfo.getAirport());
-		f1.addElement("tailNumber").setText(mtcInfo.getTailNumber());
+    	Element f1 = mtcInfoListNode.addElement("ns3:mtcInfo");
+		f1.addElement("ns3:id").setText(mtcInfo.getId());
+		f1.addElement("ns3:startTime").setText(String.valueOf(mtcInfo.getStartTime()));
+		f1.addElement("ns3:endTime").setText(String.valueOf(mtcInfo.getEndTime()));
+		f1.addElement("ns3:airport").setText(mtcInfo.getAirport());
+		f1.addElement("ns3:tailNumber").setText(mtcInfo.getTailNumber());
 		if (mtcInfo.getStatus()) {
-			f1.addElement("status").setText("Assigned");
+			f1.addElement("ns3:status").setText("Assigned");
 		}else {
-			f1.addElement("status").setText("Cancelled");
+			f1.addElement("ns3:status").setText("Cancelled");
 		}
 		return f1;
 		
@@ -305,9 +305,10 @@ public class XmlUtil {
     public static void creatOutputXml(List<FlightInfo> flightInfos,List<MtcInfo> mtcInfos,String outputPath){
     	Document document = XmlUtil.createDocument();
 		Element rootElement = document.addElement("exportAircrafts");
-		document.setRootElement(rootElement);
-		Element flightInfoList = rootElement.addElement("flightInfoList");
-		Element mtcInfoList = rootElement.addElement("mtcInfoList");
+		rootElement.addNamespace("ns3", "http://generated.recoverymanager.sabre.com/exportSchedule");
+		document.setRootElement(rootElement); 
+		Element flightInfoList = rootElement.addElement("ns3:flightInfoList");
+		Element mtcInfoList = rootElement.addElement("ns3:mtcInfoList");
 		for (Iterator iterator = flightInfos.iterator(); iterator.hasNext();) {
 			FlightInfo flightInfo = (FlightInfo) iterator.next();
 			XmlUtil.flightInfo2Element(flightInfo, flightInfoList);

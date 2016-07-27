@@ -12,14 +12,20 @@ import com.yc.airport.algorithm.FitnessCalc;
 import com.yc.airport.algorithm.Individual;
 import com.yc.airport.algorithm.Population;
 import com.yc.airport.entity.FlightInfo;
+import com.yc.airport.entity.MtcInfo;
 import com.yc.airport.entity.Schedule;
 import com.yc.airport.util.XmlUtil;
 import com.yc.airport.value.DataReader;
 import com.yc.airport.value.GenerateFlight;
 import com.yc.airport.value.GloabValue;
-
+/**
+ * 
+ * <p>Title: Main</p>
+ * <p>Description: program start class</p>
+ * @author mcfell
+ * @date 2016年6月30日
+ */
 public class Main {
-
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -27,7 +33,7 @@ public class Main {
 		DataReader.ReadAllXml(args[0]);
 		logger.info("read input data end");
 		logger.info("生成初始种群");
-		GloabValue.popNum = 100;
+		GloabValue.popNum = 200;
 		GloabValue.scheduleList = new ArrayList<Schedule>(GloabValue.popNum);
 		for (int i = 0; i < GloabValue.popNum; i++) {
 			GloabValue.scheduleList.add(GloabValue.schedule);
@@ -35,7 +41,7 @@ public class Main {
 		Population myPop = new Population(GloabValue.popNum, true);
 		// 不段迭代，进行进化操作。 直到找到期望的基因序列
 		Individual individualFittest = solution(myPop);
-		logger.info("计算完成，航班输出路径："+args[1]+"/Output.xml");
+		logger.info("计算完成，航班输出路径："+args[1]+"\\Output.xml");
 		XmlUtil.creatOutputXml(individualFittest.getFlightInfos(), individualFittest.getMtcInfos(), args[1]+"/Output.xml");
 	}
 	
@@ -43,16 +49,16 @@ public class Main {
 		int generationCount = 0;
 		long lastFitness = 0;
 		int times = 0;
-		Individual individualFittest;
+		Individual individualFittest = null;
 		while (true) {
 			generationCount++;
 			individualFittest = myPop.getFittest();
 			long nowFitness= individualFittest.getFitness();
 			logger.info("Generation: " + generationCount + " Fittest: "+ nowFitness);
-			individualFittest.printGenesInfo();
+			//individualFittest.printGenesInfo();
 			if (Math.abs(lastFitness - nowFitness)<5) {
 				times++;
-				if (times>20) {
+				if (times>300) {
 					break;
 				}
 			}else {
@@ -68,11 +74,6 @@ public class Main {
 		System.out.println("Generation: " + generationCount);
 		System.out.println("Final Fittest Genes:"+lastFitness);
 		return individualFittest;
-	}
-	
-	public static Individual solutionOptimize(Individual individual) {
-		int[] FlightGenes = individual.getFlightGene();
-		return individual;
 	}
 
 }

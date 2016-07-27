@@ -6,6 +6,7 @@ import java.util.List;
 import com.yc.airport.entity.Aircraft;
 import com.yc.airport.entity.AircraftClosure;
 import com.yc.airport.entity.FlightInfo;
+import com.yc.airport.entity.IdleTimeFlight;
 import com.yc.airport.entity.MtcInfo;
 import com.yc.airport.entity.Schedule;
 
@@ -13,9 +14,11 @@ public class GloabValue {
 	public static HashMap<String, Aircraft> aircraftsMap;
 	public static HashMap<String, List<AircraftClosure>> aircraftClosuresMap;
 	public static List<AircraftClosure> aircraftClosures;
+	public static Schedule orginSchedule;
 	public static Schedule schedule;
 	public static HashMap<String, List<FlightInfo>> flightInfoMap;
 	public static HashMap<String, List<MtcInfo>> mtcInfoMap;
+	public static HashMap<String, List<IdleTimeFlight>> idleTimeMap;
 	public static Schedule newSchdule;
 	public static List<Schedule> scheduleList;
 	

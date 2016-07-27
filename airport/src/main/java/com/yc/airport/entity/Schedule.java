@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry.Entry;
+import com.yc.airport.value.GloabValue;
 
 public class Schedule {
 	
@@ -30,12 +34,37 @@ public class Schedule {
 		this.flightInfos = flightInfos;
 		this.mtcInfos = mtcInfos;
 	}
+	
+	public void reListFlightInfo() {
+		HashMap<String, List<FlightInfo>> rHashMap = GloabValue.flightInfoMap;
+		List<FlightInfo> fList = new ArrayList<FlightInfo>(GloabValue.flightAllNum);
+		for (int i = 0; i < GloabValue.TAILS.length; i++) {
+			String tail = GloabValue.TAILS[i];
+			List<FlightInfo> flightInfos = rHashMap.get(tail);
+			fList.addAll(flightInfos);
+		}
+		this.flightInfos = fList;
+	}
+	
+	public void reListMtcInfo() {
+		HashMap<String, List<MtcInfo>> mHashMap = GloabValue.mtcInfoMap;
+		List<MtcInfo> mList = new ArrayList<MtcInfo>(GloabValue.mtcAllNum);
+		for (int i = 0; i < GloabValue.TAILS.length; i++) {
+			String tail = GloabValue.TAILS[i];
+			if (mHashMap.get(tail)==null) {
+				continue;
+			}
+			List<MtcInfo> mtcInfos = mHashMap.get(tail);
+			mList.addAll(mtcInfos);
+		}
+		this.mtcInfos = mList;
+	}
+	
 	/*
 	 * 根据飞机Tail划分航班信息
 	 */
 	public HashMap<String, List<FlightInfo>> getPartitionFlightInfoByTail(){
 		HashMap<String, List<FlightInfo>> rHashMap = new HashMap<String, List<FlightInfo>>();
-		
 		for (Iterator iterator = flightInfos.iterator(); iterator.hasNext();) {
 			FlightInfo flightInfo = (FlightInfo) iterator.next();
 			List<FlightInfo> list;

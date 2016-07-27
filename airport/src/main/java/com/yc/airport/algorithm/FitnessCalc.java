@@ -17,41 +17,36 @@ public class FitnessCalc {
 	 */
 	public static long getFitness(Individual individual) {
         long fitness = 0;
-        Schedule schedule = GloabValue.schedule;
+        Schedule schedule = GloabValue.orginSchedule;
         List<FlightInfo> flightInfos = schedule.getFlightInfos();
         //再次优化编码
-        individual.generateIndividual(0, false);
-        Individual newinIndividual = individual;
+        individual.generateIndividual(individual.getIndividualNum(), false);
+        List<FlightInfo> newFlightInfos = individual.getFlightInfos();
+        int[] mtcGene = individual.getMtcGene();
         
-        List<FlightInfo> newFlightInfos = newinIndividual.getFlightInfos();
-        List<MtcInfo> newMtcInfos = newinIndividual.getMtcInfos();
         
-        int[] flightGene = newinIndividual.getFlightGene();
-        int[] mtcGene = newinIndividual.getMtcGene();
 		for (int i = 0; i < GloabValue.flightAllNum; i++) {
 			FlightInfo flightInfo = flightInfos.get(i);
 			FlightInfo newFlightInfo = newFlightInfos.get(i);
-			int genea = flightGene[2*i];
-			int geneb = flightGene[2*i+1];
-			if (genea+geneb==0) {
-				//logger.info("cancal:"+i);
+			
+			if (newFlightInfo.getStatus() == 0) {
 				//2.取消航班代价
-				fitness+=800;
+				fitness+=GloabValue.weightCancelFlight;
 				continue;
 			}else {
 				//1.此次航班延误时间代价
 				long delay = Math.abs(newFlightInfo.getDepartureTime() - flightInfo.getDepartureTime());
-				fitness+= delay;
+				fitness+= delay * GloabValue.weightFlightDelay;
 				//4.航班交换代价
-				if (genea+geneb==2) {
-					fitness+=10;
+				if (newFlightInfo.getStatus() == 2) {
+					fitness+=GloabValue.weightFlightSwap;
 				}
 				//6.飞机终点机场与原计划终点机场不同所付出的代价
-				boolean isArrivalAirportEqual = newFlightInfo.getArrivalAirport().equals(flightInfo.getArrivalAirport())
-						&& newFlightInfo.getDepartureAirport().equals(flightInfo.getDepartureAirport());
-				if (!isArrivalAirportEqual) {
-					fitness+=10;
-				}
+//				boolean isArrivalAirportEqual = newFlightInfo.getArrivalAirport().equals(flightInfo.getArrivalAirport())
+//						&& newFlightInfo.getDepartureAirport().equals(flightInfo.getDepartureAirport());
+//				if (!isArrivalAirportEqual) {
+//					fitness+=GloabValue.weightViolateBalance;
+//				}
 			} 
 			
 		}
