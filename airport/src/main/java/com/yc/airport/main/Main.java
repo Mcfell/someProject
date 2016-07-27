@@ -68,7 +68,7 @@ public class Main {
 			lastFitness = nowFitness;
 		}
 		System.out.println("Solution found!");
-		//individualFittest.checkIsContinuous();
+		individualFittest.checkIsContinuous();
 		individualFittest.printGenesInfo();
 		individualFittest.printSchedualInfo(true);
 		System.out.println("Generation: " + generationCount);
