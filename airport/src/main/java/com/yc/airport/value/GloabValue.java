@@ -36,6 +36,8 @@ public class GloabValue {
 	public static int maxRunTime;
 	public static int turnTime;
 	
+	public static final int DEPARTURE_TYPE = 1;
+	public static final int ARRIVIAL_TYPE = 2;
 	public static String[] AIRPORTS;
 	public static String[] TAILS;
 	

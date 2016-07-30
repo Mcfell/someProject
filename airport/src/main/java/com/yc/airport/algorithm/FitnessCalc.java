@@ -22,8 +22,7 @@ public class FitnessCalc {
         //再次优化编码
         individual.generateIndividual(individual.getIndividualNum(), false);
         List<FlightInfo> newFlightInfos = individual.getFlightInfos();
-        int[] mtcGene = individual.getMtcGene();
-        
+        List<MtcInfo> mtcInfos = individual.getMtcInfos();
         
 		for (int i = 0; i < GloabValue.flightAllNum; i++) {
 			FlightInfo flightInfo = flightInfos.get(i);
@@ -31,15 +30,15 @@ public class FitnessCalc {
 			
 			if (newFlightInfo.getStatus() == 0) {
 				//2.取消航班代价
-				fitness+=GloabValue.weightCancelFlight;
+				fitness += GloabValue.weightCancelFlight;
 				continue;
 			}else {
 				//1.此次航班延误时间代价
 				long delay = Math.abs(newFlightInfo.getDepartureTime() - flightInfo.getDepartureTime());
-				fitness+= delay * GloabValue.weightFlightDelay;
+				fitness += delay * GloabValue.weightFlightDelay;
 				//4.航班交换代价
-				if (newFlightInfo.getStatus() == 2) {
-					fitness+=GloabValue.weightFlightSwap;
+				if (!newFlightInfo.getTailNumber().equals(flightInfo.getTailNumber())) {
+					fitness += GloabValue.weightFlightSwap;
 				}
 				//6.飞机终点机场与原计划终点机场不同所付出的代价
 //				boolean isArrivalAirportEqual = newFlightInfo.getArrivalAirport().equals(flightInfo.getArrivalAirport())
@@ -51,8 +50,11 @@ public class FitnessCalc {
 			
 		}
 		//3.取消维护任务代价
-		for (int i = 0; i < GloabValue.mtcAllNum; i++) {
-			fitness+=mtcGene[i]*1000;
+		for (MtcInfo mtcInfo : mtcInfos) {
+			if (!mtcInfo.getStatus()) {
+				fitness+=GloabValue.weightCancelMaintenance;
+			}
+			
 		}
         return fitness;
     }

@@ -13,7 +13,7 @@ public class Algorithm {
     /* GA 算法的参数 */
     private static final double uniformRate = 0.6; //交叉概率
     private static final double mutationRate = 0.015; //突变概率
-    private static final int tournamentSize = 50; //淘汰数组的大小
+    private static final int tournamentSize = 10; //淘汰数组的大小
     private static final boolean elitism = true; //精英主义
 
     /* Public methods */
@@ -91,44 +91,6 @@ public class Algorithm {
         Individual fittest = tournamentPop.getFittest();
         return fittest;
     }
-    
-    private static Individual solution(Population myPop) {
-		int generationCount = 0;
-		long lastFitness = 0;
-		int times = 0;
-		Individual individualFittest = null;
-		while (true) {
-			generationCount++;
-			individualFittest = myPop.getFittest();
-			long nowFitness= individualFittest.getFitness();
-			logger.info("Generation: " + generationCount + " Fittest: "+ nowFitness);
-			individualFittest.printGenesInfo();
-			if (Math.abs(lastFitness - nowFitness)<5) {
-				times++;
-				if (times>20) {
-					break;
-				}
-			}else {
-				times=0;
-			}
-			myPop = Algorithm.evolvePopulation(myPop);
-			lastFitness = nowFitness;
-		}
-		System.out.println("Solution found!");
-		individualFittest.checkIsContinuous();
-		individualFittest.printGenesInfo();
-		individualFittest.printSchedualInfo(true);
-		System.out.println("Generation: " + generationCount);
-		System.out.println("Final Fittest Genes:"+lastFitness);
-		return individualFittest;
-	}
-	
-	public static Individual solutionOptimize(Individual individual) {
-		int[] flightGenes = individual.getFlightGene();
-		int[] mtcGenes = individual.getMtcGene();
-		List<FlightInfo> flightInfos =	individual.getFlightInfos();
-		List<MtcInfo> mtcInfos = individual.getMtcInfos();
-		
-		return individual;
-	}
+
+
 }

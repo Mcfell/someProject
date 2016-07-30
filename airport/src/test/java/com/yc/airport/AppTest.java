@@ -29,6 +29,7 @@ import org.dom4j.io.SAXReader;
 
 
 
+
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.yc.airport.algorithm.Individual;
 import com.yc.airport.entity.Aircraft;
@@ -37,6 +38,7 @@ import com.yc.airport.entity.Schedule;
 import com.yc.airport.util.XmlUtil;
 import com.yc.airport.value.DataReader;
 import com.yc.airport.value.GenerateFlight;
+import com.yc.airport.value.GloabValue;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -188,10 +190,13 @@ public class AppTest extends TestCase {
 		individual.getMtcGene();
 	}
 	public void testIndividual() {
+		DataReader.ReadAllXml("E:/program/Scenarios/Scn4/Input");
 		Individual individual = new Individual();
 		//individual.generateIndividual();
-		individual.getFlightGene();
-		individual.getMtcGene();
+		System.out.println(GloabValue.mtcAllNum);
+		System.out.println(individual.getMtcGene().length);
+		//individual.generateIndividual(0, true);
+		//individual.printSchedualInfo(true);
 	}
 	public void testCreatXml() throws Exception{
 		Document document = XmlUtil.createDocument();

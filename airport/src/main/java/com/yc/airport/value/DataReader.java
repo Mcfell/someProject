@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 import com.yc.airport.entity.Aircraft;
 import com.yc.airport.entity.AircraftClosure;
 import com.yc.airport.entity.MtcInfo;
@@ -132,6 +133,7 @@ public class DataReader {
 			
 			flightInfos.add(flightInfo);
 		}
+		int i = 0;
 		for (Iterator iter = mtcInfoList.iterator(); iter.hasNext(); ) {
 			Element attribute = (Element) iter.next();
 			Element id=(Element) attribute.element("id");
@@ -143,9 +145,10 @@ public class DataReader {
 			MtcInfo mtcInfo = new MtcInfo(id.getStringValue(),Long.valueOf(startTime.getStringValue()),
 					Long.valueOf(endTime.getStringValue()),airport.getStringValue(),tailNumber.getStringValue());
 			//System.out.println(mtcInfo.toString());
+			tailSet.add(mtcInfo.getTailNumber());
 			mtcInfos.add(mtcInfo);
+			i++;
 		}
-		
 		Schedule schedule = new Schedule(flightInfos, mtcInfos);
 		String[] airportStrings = new String[airportSet.size()];
 		String[] tailsStrings = new String[tailSet.size()];

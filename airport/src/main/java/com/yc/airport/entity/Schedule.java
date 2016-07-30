@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry.Entry;
 import com.yc.airport.value.GloabValue;
 
 public class Schedule {
@@ -23,6 +20,7 @@ public class Schedule {
 		return mtcInfos;
 	}
 	public void setMtcInfos(List<MtcInfo> mtcInfos) {
+		
 		this.mtcInfos = mtcInfos;
 	}
 	public Schedule() {
@@ -40,6 +38,9 @@ public class Schedule {
 		List<FlightInfo> fList = new ArrayList<FlightInfo>(GloabValue.flightAllNum);
 		for (int i = 0; i < GloabValue.TAILS.length; i++) {
 			String tail = GloabValue.TAILS[i];
+			if (rHashMap.get(tail)==null) {
+				continue;
+			}
 			List<FlightInfo> flightInfos = rHashMap.get(tail);
 			fList.addAll(flightInfos);
 		}
@@ -48,7 +49,7 @@ public class Schedule {
 	
 	public void reListMtcInfo() {
 		HashMap<String, List<MtcInfo>> mHashMap = GloabValue.mtcInfoMap;
-		List<MtcInfo> mList = new ArrayList<MtcInfo>(GloabValue.mtcAllNum);
+		List<MtcInfo> mList = new ArrayList<MtcInfo>();
 		for (int i = 0; i < GloabValue.TAILS.length; i++) {
 			String tail = GloabValue.TAILS[i];
 			if (mHashMap.get(tail)==null) {
@@ -65,8 +66,8 @@ public class Schedule {
 	 */
 	public HashMap<String, List<FlightInfo>> getPartitionFlightInfoByTail(){
 		HashMap<String, List<FlightInfo>> rHashMap = new HashMap<String, List<FlightInfo>>();
-		for (Iterator iterator = flightInfos.iterator(); iterator.hasNext();) {
-			FlightInfo flightInfo = (FlightInfo) iterator.next();
+		for (Iterator<FlightInfo> iterator = flightInfos.iterator(); iterator.hasNext();) {
+			FlightInfo flightInfo = iterator.next();
 			List<FlightInfo> list;
 			String tail = flightInfo.getTailNumber();
 			if (rHashMap.get(tail) == null) {
@@ -85,9 +86,8 @@ public class Schedule {
 	 */
 	public HashMap<String, List<MtcInfo>> getPartitionMtcInfoByTail(){
 		HashMap<String, List<MtcInfo>> rHashMap = new HashMap<String, List<MtcInfo>>();
-		
-		for (Iterator iterator = mtcInfos.iterator(); iterator.hasNext();) {
-			MtcInfo mtcInfo = (MtcInfo) iterator.next();
+		for (Iterator<MtcInfo> iterator = mtcInfos.iterator(); iterator.hasNext();) {
+			MtcInfo mtcInfo = iterator.next();
 			List<MtcInfo> list;
 			if (rHashMap.get(mtcInfo.getTailNumber())==null) {
 				list = new ArrayList<MtcInfo>();
@@ -98,7 +98,6 @@ public class Schedule {
 			}
 			rHashMap.put(mtcInfo.getTailNumber(), list);
 		}
-		
 		return rHashMap;
 	}
 	

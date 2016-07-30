@@ -7,7 +7,24 @@ public class FlightInfo {
 	private String departureAirport;
 	private String arrivalAirport;
 	private String tailNumber;
+	private boolean isinMtc;
+	private MtcInfo mtcInfo;
 	private int status = 1;
+	
+	
+	
+	public MtcInfo getMtcInfo() {
+		return mtcInfo;
+	}
+	public void setMtcInfo(MtcInfo mtcInfo) {
+		this.mtcInfo = mtcInfo;
+	}
+	public boolean isInMtc() {
+		return isinMtc;
+	}
+	public void setMtc(boolean isinMtc) {
+		this.isinMtc = isinMtc;
+	}
 	public String getId() {
 		return id;
 	}

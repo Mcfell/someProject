@@ -33,11 +33,7 @@ public class Main {
 		DataReader.ReadAllXml(args[0]);
 		logger.info("read input data end");
 		logger.info("生成初始种群");
-		GloabValue.popNum = 200;
-		GloabValue.scheduleList = new ArrayList<Schedule>(GloabValue.popNum);
-		for (int i = 0; i < GloabValue.popNum; i++) {
-			GloabValue.scheduleList.add(GloabValue.schedule);
-		}
+		GloabValue.popNum = 100;
 		Population myPop = new Population(GloabValue.popNum, true);
 		// 不段迭代，进行进化操作。 直到找到期望的基因序列
 		Individual individualFittest = solution(myPop);
@@ -58,7 +54,7 @@ public class Main {
 			//individualFittest.printGenesInfo();
 			if (Math.abs(lastFitness - nowFitness)<5) {
 				times++;
-				if (times>300) {
+				if (times>10) {
 					break;
 				}
 			}else {
@@ -68,7 +64,7 @@ public class Main {
 			lastFitness = nowFitness;
 		}
 		System.out.println("Solution found!");
-		individualFittest.checkIsContinuous();
+		//individualFittest.checkIsContinuous();
 		individualFittest.printGenesInfo();
 		individualFittest.printSchedualInfo(true);
 		System.out.println("Generation: " + generationCount);
