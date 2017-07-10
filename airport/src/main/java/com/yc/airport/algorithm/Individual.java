@@ -605,6 +605,14 @@ public class Individual implements Cloneable {
 		return true;
 	}
 
+    /**
+     *
+     * @param flight
+     * @param genesNum
+     * @param head
+     * @param flightInfoLength
+     * @return
+     */
 	private boolean checkIsOverMtc(FlightInfo flight,int genesNum ,int head,int flightInfoLength){
 		HashMap<String, List<MtcInfo>> mtcInfoMap = GloabValue.mtcInfoMap;
 		List<MtcInfo> mtcInfos = mtcInfoMap.get(flight.getTailNumber());
@@ -626,7 +634,7 @@ public class Individual implements Cloneable {
 					flight.setMtcInfo(mtcInfo);
 					flight.setMtc(true);
 					int next = FindNextSameStAirportFlight(genesNum, head, flightInfoLength, flight.getDepartureAirport(), GloabValue.DEPARTURE_TYPE);
-					next = next<0?(flightInfoLength + head -genesNum):next;
+					next = next<0?(flightInfoLength + head - genesNum):next;
 					if (delay < GloabValue.maxDelayTime && delay/60* GloabValue.weightFlightDelay <= next * GloabValue.weightCancelFlight) {
 						genes[genesNum] = 1;
 						flight.setStatus(1);
@@ -677,7 +685,10 @@ public class Individual implements Cloneable {
 	}
 	
 	
-	/*
+	/**
+	 *
+	 * 判断航班是否关闭
+	 *
 	 * return false:没关闭，延迟后执行航班 ；true：取消航班
 	 */
 	private boolean checkIsAirportClose(FlightInfo flightInfo, int genesNum, int head, int flightInfosLength) {
@@ -776,13 +787,23 @@ public class Individual implements Cloneable {
 		}
 		return -1;
 	}
-	
+
+    /**
+     * 找到下一趟在同一机场的航班
+     * @param genesNum
+     * @param head
+     * @param flightInfoLength
+     * @param ArrivialAirport
+     * @param searchType
+     * @return
+     */
 	private int FindNextSameStAirportFlight(int genesNum, int head,
 			int flightInfoLength, String ArrivialAirport, int searchType) {
 		int next = genesNum + 1;
 		boolean flag = false;
 		if (searchType == GloabValue.DEPARTURE_TYPE) {
 			while(next < head+flightInfoLength){
+			    //执行航班 且 在同一出发机场
 				if (genes[next]==1 && flightInfos.get(next).getDepartureAirport().equals(ArrivialAirport)){ 
 					flag = true;
 					break;

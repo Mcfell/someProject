@@ -11,13 +11,19 @@ import com.yc.airport.entity.MtcInfo;
 import com.yc.airport.entity.Schedule;
 
 public class GloabValue {
+	//每架飞机对应的空闲时段
 	public static HashMap<String, Aircraft> aircraftsMap;
+	//每个机场关闭时间段
 	public static HashMap<String, List<AircraftClosure>> aircraftClosuresMap;
+	//机场关闭时段列表
 	public static List<AircraftClosure> aircraftClosures;
 	public static Schedule orginSchedule;
 	public static Schedule schedule;
+	//每架飞机与所跑航班的映射
 	public static HashMap<String, List<FlightInfo>> flightInfoMap;
+	//每架飞机与维护信息的映射
 	public static HashMap<String, List<MtcInfo>> mtcInfoMap;
+	//每架飞机空闲时段映射
 	public static HashMap<String, List<IdleTimeFlight>> idleTimeMap;
 	public static Schedule newSchdule;
 	public static List<Schedule> scheduleList;

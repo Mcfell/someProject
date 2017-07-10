@@ -9,7 +9,7 @@ import com.yc.airport.entity.FlightInfo;
 import com.yc.airport.entity.MtcInfo;
 /** 
  * 遗传算法 
- *／
+ */
 public class Algorithm {
 	private static final Logger logger = LoggerFactory.getLogger(Algorithm.class);
     /* GA 算法的参数 */
